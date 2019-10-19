@@ -4,9 +4,7 @@ from operator import itemgetter
 def report_all_functions(results, errors, args):
 
     # Print globals.
-    print("-------------------------------------------------------------------------------")
-    print("Globals                                                                        ")
-    print("-------------------------------------------------------------------------------")
+    __print_heading("Globals")
     for result in results:
         for g in result['globals_vars']:
             print(result['filename'] + ':' + str(g.line_number) + ' ' + g.name)
@@ -25,9 +23,7 @@ def report_all_functions(results, errors, args):
     functions = [f for f in functions if f['complexity'] >= args.t]
 
     # Print functions.
-    print("-------------------------------------------------------------------------------")
-    print("Functions                                                            complexity")
-    print("-------------------------------------------------------------------------------")
+    __print_heading("Functions                                                            complexity")
     for f in functions:
         remaining_filename = __print_wrapped_and_indented_string(f['filename'], 72)
         print(remaining_filename + ':' + str(f['line_number']))
@@ -38,9 +34,7 @@ def report_all_functions(results, errors, args):
         print('{name:70} {complexity:3}'.format(name=remaining_function_name, complexity=f['complexity']))
 
     if args.e:
-        print("-------------------------------------------------------------------------------")
-        print("Errors                                                                         ")
-        print("-------------------------------------------------------------------------------")
+        __print_heading("Errors")
         for e in errors:
             print("*** ERROR PROCESSING: " + e.filename)
             print(e.message)
@@ -54,9 +48,7 @@ def report_ksf_for_all_modules(results, errors, args):
     # Only display results above a threshold.
     results = [r for r in results if r['ksf'] >= args.t]
 
-    print("-------------------------------------------------------------------------------")
-    print("File                                         complexity   globals   lines   ksf")
-    print("-------------------------------------------------------------------------------")
+    __print_heading("File                                         complexity   globals   lines   ksf")
     for result in results:
         remaining_filename = __print_wrapped_and_indented_string(result['filename'], 50)
         if remaining_filename != result['filename']:
@@ -70,9 +62,7 @@ def report_ksf_for_all_modules(results, errors, args):
                 loc=result['loc'], ksf=result['ksf']))
 
     if args.e:
-        print("-------------------------------------------------------------------------------")
-        print("Errors                                                                         ")
-        print("-------------------------------------------------------------------------------")
+        __print_heading("Errors")
         for e in errors:
             print("*** ERROR PROCESSING: " + e.filename)
             print(e.message)
@@ -96,3 +86,10 @@ def __print_wrapped_and_indented_string(str, width):
         # print is indented.
         print("    ", end='')
     return remaining_str
+
+
+def __print_heading(text):
+    print("-------------------------------------------------------------------------------")
+    print(text)
+    print("-------------------------------------------------------------------------------")
+
