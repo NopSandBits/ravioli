@@ -61,10 +61,9 @@ def run_single_file(filename):
     try:
         results = c_parser.parse(filename, '.')
         functions = []
-        # Convert from key-value pairs to Function objects.
-        for f, c in results['functions'].items():
-            # TODO: Fix the line number.
-            functions.append(Function(f, c, 0))
+        # Convert from a hash to a list of Functions.
+        for name, function in results['functions'].items():
+            functions.append(function)
 
         globals_vars = results['globals']
         with open(filename, 'r') as f:

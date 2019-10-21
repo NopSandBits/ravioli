@@ -4,6 +4,7 @@ from subprocess import check_output
 import pycparser
 from pycparser import c_ast
 
+from ravioli.function import Function
 from ravioli.global_variable import GlobalVariable
 
 
@@ -52,7 +53,8 @@ class CustomVisitor(c_ast.NodeVisitor):
         return complexity
 
     def visit_FuncDef(self, node):
-        self.results['functions'][node.decl.name] = self.calculate_complexity(node.body) + 1
+        self.results['functions'][node.decl.name] = Function(node.decl.name, self.calculate_complexity(node.body) + 1,
+                                                             node.decl.coord.line)
 
 
 def find_globals(ast):
