@@ -79,7 +79,7 @@ def run_single_file(filename):
     except ParseError as e:
         return ParsingError(filename, e.args)
     except:
-        return ParsingError(filename, 'unknown error')
+        return ParsingError(filename, traceback.format_exc())
 
 
 def find_max_complexity(functions):
