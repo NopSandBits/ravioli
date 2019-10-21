@@ -7,6 +7,7 @@ verify_ssl = true
 
 [packages]
 pytest = "*"
+pycparser = "*"
 
 [requires]
 python_version = "3.7"

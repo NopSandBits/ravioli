@@ -3,7 +3,14 @@ import os
 import traceback
 from pathlib import Path
 
+from pprint import pprint
+
+import inspect
+from pycparser.plyparser import ParseError
+
+from ravioli import c_parser
 from ravioli.complexity import calculate_complexity
+from ravioli.function import Function
 from ravioli.global_finder import find_globals
 from ravioli.line_counter import count
 from ravioli.report_generator import report_all_functions, report_ksf_for_all_modules
@@ -23,7 +30,12 @@ def process_files(args, filename):
     errors = []
     if not os.path.isdir(filename):
         # This is a single file.
-        results.append(run_single_file(filename))
+        result = run_single_file(filename)
+        if __file_result_is_valid(result):
+            # Only save results that are valid.
+            results.append(result)
+        if type(result) is ParsingError:
+            errors.append(result)
     else:
         # This is a directory. Run on all the files we can find.
         source_files = get_source_files(args)
@@ -45,21 +57,29 @@ class ParsingError:
 
 
 def run_single_file(filename):
+
     try:
+        results = c_parser.parse(filename, '.')
+        functions = []
+        # Convert from key-value pairs to Function objects.
+        for f, c in results['functions'].items():
+            # TODO: Fix the line number.
+            functions.append(Function(f, c, 0))
+
+        globals_vars = results['globals']
         with open(filename, 'r') as f:
             contents = f.read()
-            functions = calculate_complexity(contents)
-            globals_vars = find_globals(contents)
             loc = count(contents)
-            # Find the maximum complexity (scc) of all functions.
-            max_scc = find_max_complexity(functions)
-            # Calculate the spaghetti factor.
-            ksf = max_scc + (5 * len(globals_vars)) + (loc // 20)
-            return {'filename': filename, 'functions': functions, 'max_scc': max_scc, 'globals_vars': globals_vars,
-                    'loc': loc, 'ksf': ksf}
+        # Find the maximum complexity (scc) of all functions.
+        max_scc = find_max_complexity(functions)
+        # Calculate the spaghetti factor.
+        ksf = max_scc + (5 * len(globals_vars)) + (loc // 20)
+        return {'filename': filename, 'functions': functions, 'max_scc': max_scc, 'globals_vars': globals_vars,
+                'loc': loc, 'ksf': ksf}
+    except ParseError as e:
+        return ParsingError(filename, e.args)
     except:
-        # There was an error parsing this file.
-        return ParsingError(filename, traceback.format_exc())
+        return ParsingError(filename, 'unknown error')
 
 
 def find_max_complexity(functions):

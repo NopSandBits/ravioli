@@ -1,5 +1,7 @@
 from operator import itemgetter
 
+from pprint import pprint
+
 
 def report_all_functions(results, errors, args):
 
@@ -41,7 +43,6 @@ def report_all_functions(results, errors, args):
 
 
 def report_ksf_for_all_modules(results, errors, args):
-
     # Sort by spaghetti factor.
     results = sorted(results, key=itemgetter('ksf'), reverse=True)
 
