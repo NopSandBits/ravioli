@@ -66,7 +66,7 @@ def find_globals(ast):
             if ("static" not in external_declaration.storage and "extern" not in external_declaration.storage and
                     type(external_declaration.type) is c_ast.TypeDecl):
                 # TODO: Fix the line number.
-                global_variables.append(GlobalVariable(external_declaration.name, 0))
+                global_variables.append(GlobalVariable(external_declaration.name, external_declaration.coord.line))
 
     return global_variables
 
